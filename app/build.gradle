@@ -1,0 +1,54 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url "https://oss.sonatype.org/content/repositories/snapshots"
+        }
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:1.0.1'
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4'
+        classpath 'org.robolectric:robolectric-gradle-plugin:0.14.1'
+    }
+}
+
+//apply plugin: 'android-sdk-manager' // Added by Jake Wharton
+apply plugin: 'com.android.application'
+apply plugin: 'com.neenbedankt.android-apt'
+
+repositories {
+    mavenCentral()
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots"
+    }
+}
+
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 21
+    buildToolsVersion "21.1.2"
+
+    defaultConfig {
+        applicationId "co.ikust.daggerinjector"
+        minSdkVersion 8
+        targetSdkVersion 21
+        versionCode 1
+        versionName "1.0.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+
+    compile 'com.android.support:appcompat-v7:21.0.2'
+//
+    compile files('libs/dagger-2.0.jar')
+    provided files('libs/dagger-compiler-2.0.jar')
+//    apt files('libs/daggerinjector-1.0.0.jar')
+}

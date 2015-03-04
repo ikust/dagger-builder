@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/DaggerInjector.iml" filepath="$PROJECT_DIR$/DaggerInjector.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/daggerinjectorcompiler/daggerinjectorcompiler.iml" filepath="$PROJECT_DIR$/daggerinjectorcompiler/daggerinjectorcompiler.iml" />
+      <module fileurl="file://$PROJECT_DIR$/injector/injector.iml" filepath="$PROJECT_DIR$/injector/injector.iml" />
+      <module fileurl="file://$PROJECT_DIR$/library/library.iml" filepath="$PROJECT_DIR$/library/library.iml" />
+    </modules>
+  </component>
+</project>
+
