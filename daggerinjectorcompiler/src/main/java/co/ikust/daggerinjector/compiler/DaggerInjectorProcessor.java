@@ -3,6 +3,9 @@ package co.ikust.daggerinjector.compiler;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -12,8 +15,13 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.DeclaredType;
+import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 
 import dagger.Component;
@@ -38,26 +46,88 @@ public class DaggerInjectorProcessor extends AbstractProcessor {
         filer = processingEnv.getFiler();
     }
 
+    private static <T> T findAnnotationValue(Element element, String annotationClass,
+            String valueName, Class<T> expectedType) {
+        T ret = null;
+        for (AnnotationMirror annotationMirror : element.getAnnotationMirrors()) {
+            DeclaredType annotationType = annotationMirror.getAnnotationType();
+            TypeElement annotationElement = (TypeElement) annotationType
+                    .asElement();
+            if (annotationElement.getQualifiedName().contentEquals(
+                    annotationClass)) {
+                ret = extractValue(annotationMirror, valueName, expectedType);
+                break;
+            }
+        }
+        return ret;
+    }
+
+    private static <T> T extractValue(AnnotationMirror annotationMirror,
+            String valueName, Class<T> expectedType) {
+        Map<ExecutableElement, AnnotationValue> elementValues = new HashMap<ExecutableElement, AnnotationValue>(
+                annotationMirror.getElementValues());
+        for (Map.Entry<ExecutableElement, AnnotationValue> entry : elementValues
+                .entrySet()) {
+            if (entry.getKey().getSimpleName().contentEquals(valueName)) {
+                Object value = entry.getValue().getValue();
+                return expectedType.cast(value);
+            }
+        }
+        return null;
+    }
+
+    private String getModuleMethodName(String moduleName) {
+        return moduleName.substring(0, 1).toLowerCase() + moduleName.substring(1);
+    }
+
+    private String getPackageName(Element element) {
+        TypeElement type = (TypeElement) element;
+
+        String simpleName = element.getSimpleName().toString();
+        String fullyQualifiedName = type.getQualifiedName().toString();
+
+        return fullyQualifiedName.substring(0, fullyQualifiedName.length() - (simpleName.length() + 1));
+    }
+
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         InjectorBuilder builder = new InjectorBuilder();
 
         //@Component
         for(Element element : roundEnv.getElementsAnnotatedWith(Component.class)) {
-            Component componentAnnotation = element.getAnnotation(Component.class);
-
             TypeElement type = (TypeElement) element;
 
-            String componentName = type.getSimpleName().toString();
+            Component componentAnnotation = element.getAnnotation(Component.class);
 
-            Class<?>[] modules = componentAnnotation.modules();
+            String componentName = type.getSimpleName().toString();
+            String componentPackage = type.getQualifiedName().toString();
+            componentPackage = componentPackage.substring(0, componentPackage.length() - (componentName.length() + 1));
+
+            processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, componentName);
+
+            List<AnnotationValue> modules = findAnnotationValue(element, "dagger.Component", "modules", List.class);
             ArrayList<String> moduleNames = new ArrayList<>();
 
-            for(Class<?> module : modules) {
-                moduleNames.add(module.getName());
+            ArrayList<Module> moduleData = new ArrayList<>();
+
+            for(AnnotationValue module : modules) {
+                DeclaredType moduleType = (DeclaredType) module.getValue();
+
+                Module moduleMetadata = new Module(
+                        getModuleMethodName(moduleType.asElement().getSimpleName().toString()),
+                        getPackageName(moduleType.asElement())
+                );
+
+                moduleData.add(moduleMetadata);
             }
 
-            builder.addComponent(componentName, moduleNames);
+            co.ikust.daggerinjector.compiler.Component component = new co.ikust.daggerinjector.compiler.Component(
+                    componentName,
+                    componentPackage,
+                    moduleData
+            );
+
+            builder.addComponent(component);
         }
 
         generateDatabaseHelperSourceFile(builder);
@@ -67,7 +137,9 @@ public class DaggerInjectorProcessor extends AbstractProcessor {
 
     private void generateDatabaseHelperSourceFile(InjectorBuilder builder) {
         try {
-            JavaFileObject adapterSource = filer.createSourceFile("co.ikust.daggerinjector.DaggerInjector");
+            processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, builder.createImplementation());
+
+            JavaFileObject adapterSource = filer.createSourceFile("co.ikust.daggerinjector.DaggerInjectorConfig");
 
             Writer writer = adapterSource.openWriter();
             writer.write(builder.createImplementation());

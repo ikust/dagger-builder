@@ -1,9 +1,14 @@
 package co.ikust.daggerinjector;
 
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import co.ikust.daggerinjector.coffemaker.CoffeeShop;
+import co.ikust.daggerinjector.coffemaker.module.DripCoffeeModule;
+import co.ikust.daggerinjector.example.R;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -12,8 +17,11 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-    }
 
+        CoffeeShop coffeeShop = DaggerInjector.inject(CoffeeShop.class, new DripCoffeeModule());
+
+        Log.d("coffeeShop", coffeeShop.toString());
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

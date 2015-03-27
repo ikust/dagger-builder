@@ -1,8 +1,19 @@
 apply plugin: 'com.android.library'
 
+repositories {
+    mavenCentral()
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots"
+    }
+    flatDir {
+        dirs 'libs/aars'
+    }
+}
+
 android {
     compileSdkVersion 21
     buildToolsVersion "21.1.2"
+
 
     defaultConfig {
         minSdkVersion 8
@@ -10,6 +21,13 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+
+
     buildTypes {
         release {
             minifyEnabled false
@@ -20,5 +38,6 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:21.0.2'
+
+    compile 'co.ikust.daggerinjector:injector:1.0.0@aar'
 }

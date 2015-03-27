@@ -1,6 +1,6 @@
 package co.ikust.daggerinjector.compiler;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by ivan on 03/03/15.
@@ -9,18 +9,24 @@ public class Component {
 
     private String name;
 
-    private ArrayList<String> moduleNames;
+    private String packageName;
 
-    public Component(String name, ArrayList<String> moduleNames) {
+    private List<Module> modules;
+
+    public Component(String name, String packageName, List<Module> moduleNames) {
         this.name = name;
-        this.moduleNames = moduleNames;
+        this.modules = moduleNames;
     }
 
     public String getName() {
         return name;
     }
 
-    public ArrayList<String> getModuleNames() {
-        return moduleNames;
+    public String getPackageName() {
+        return packageName;
+    }
+
+    public List<Module> getModules() {
+        return modules;
     }
 }

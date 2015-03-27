@@ -12,37 +12,38 @@ public class InjectorBuilder {
 
     private ArrayList<Component> components = new ArrayList<>();
 
-
-    public void addComponent(String name, ArrayList<String> modules) {
-        components.add(new Component(name, modules));
+    public void addComponent(Component component) {
+        components.add(component);
     }
 
     private Template generateInjector(Component component) {
-        Template template = Templates.getInstance().read("injector_init.tpl");
+        Template template = Templates.getInstance().read("/injector_init.tpl");
 
         template.addReplacement("componentName", component.getName());
+        template.addReplacement("componentPackage", component.getPackageName());
 
-        for(int i = 0; i < component.getModuleNames().size(); i++) {
+        for(int i = 0; i < component.getModules().size(); i++) {
             template.addReplacement(
                     "injectImplementation",
-                    generateTemplateParam(component.getModuleNames().get(i), i)
+                    generateTemplateParam(component.getModules().get(i), i)
             );
         }
 
         return template;
     }
 
-    private Template generateTemplateParam(String moduleName, int index) {
-        Template template = Templates.getInstance().read("module_param.tpl");
+    private Template generateTemplateParam(Module module, int index) {
+        Template template = Templates.getInstance().read("/module_param.tpl");
 
-        template.addReplacement("moduleName", moduleName);
+        template.addReplacement("moduleMethodName", module.getMethodName());
+        template.addReplacement("moduleName", module.getName());
         template.addReplacement("moduleIndex", String.valueOf(index));
 
         return template;
     }
 
     public String createImplementation() {
-        Template template = Templates.getInstance().read("DaggerInjector.tpl");
+        Template template = Templates.getInstance().read("/DaggerInjectorConfig.tpl");
 
         for(Component component : components) {
             template.addReplacementLine("injectorsInit", generateInjector(component));
