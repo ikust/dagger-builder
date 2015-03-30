@@ -8,7 +8,7 @@ import co.ikust.simpletemplates.Templates;
 /**
  * Created by ivan on 03/03/15.
  */
-public class InjectorBuilder {
+public class InjectorConfigBuilder {
 
     private ArrayList<Component> components = new ArrayList<>();
 
@@ -20,7 +20,7 @@ public class InjectorBuilder {
         Template template = Templates.getInstance().read("/injector_init.tpl");
 
         template.addReplacement("componentName", component.getName());
-        template.addReplacement("componentPackage", component.getPackageName());
+        template.addReplacement("packageName", component.getPackageName());
 
         for(int i = 0; i < component.getModules().size(); i++) {
             template.addReplacement(

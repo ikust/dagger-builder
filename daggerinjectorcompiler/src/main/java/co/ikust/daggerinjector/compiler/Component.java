@@ -15,6 +15,7 @@ public class Component {
 
     public Component(String name, String packageName, List<Module> moduleNames) {
         this.name = name;
+        this.packageName = packageName;
         this.modules = moduleNames;
     }
 

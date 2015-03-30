@@ -89,9 +89,15 @@ public class DaggerInjectorProcessor extends AbstractProcessor {
         return fullyQualifiedName.substring(0, fullyQualifiedName.length() - (simpleName.length() + 1));
     }
 
+    private String getFullyQualifiedName(Element element) {
+        TypeElement type = (TypeElement) element;
+
+        return type.getQualifiedName().toString();
+    }
+
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        InjectorBuilder builder = new InjectorBuilder();
+        InjectorConfigBuilder builder = new InjectorConfigBuilder();
 
         //@Component
         for(Element element : roundEnv.getElementsAnnotatedWith(Component.class)) {
@@ -100,14 +106,12 @@ public class DaggerInjectorProcessor extends AbstractProcessor {
             Component componentAnnotation = element.getAnnotation(Component.class);
 
             String componentName = type.getSimpleName().toString();
-            String componentPackage = type.getQualifiedName().toString();
-            componentPackage = componentPackage.substring(0, componentPackage.length() - (componentName.length() + 1));
+            String componentPackage = getPackageName(type);
 
             processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, componentName);
+            processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, componentPackage);
 
             List<AnnotationValue> modules = findAnnotationValue(element, "dagger.Component", "modules", List.class);
-            ArrayList<String> moduleNames = new ArrayList<>();
-
             ArrayList<Module> moduleData = new ArrayList<>();
 
             for(AnnotationValue module : modules) {
@@ -115,7 +119,7 @@ public class DaggerInjectorProcessor extends AbstractProcessor {
 
                 Module moduleMetadata = new Module(
                         getModuleMethodName(moduleType.asElement().getSimpleName().toString()),
-                        getPackageName(moduleType.asElement())
+                        getFullyQualifiedName(moduleType.asElement())
                 );
 
                 moduleData.add(moduleMetadata);
@@ -135,10 +139,8 @@ public class DaggerInjectorProcessor extends AbstractProcessor {
         return true;
     }
 
-    private void generateDatabaseHelperSourceFile(InjectorBuilder builder) {
+    private void generateDatabaseHelperSourceFile(InjectorConfigBuilder builder) {
         try {
-            processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, builder.createImplementation());
-
             JavaFileObject adapterSource = filer.createSourceFile("co.ikust.daggerinjector.DaggerInjectorConfig");
 
             Writer writer = adapterSource.openWriter();
