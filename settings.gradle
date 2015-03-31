@@ -1,1 +1,1 @@
-include ':app', ':library', ':injector', ':daggerinjectorcompiler'
+include ':app', ':library', ':config', ':daggerbuildercompiler'

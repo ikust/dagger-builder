@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import co.ikust.daggerbuilder.DaggerBuilder;
 import co.ikust.daggerinjector.coffemaker.CoffeeShop;
 import co.ikust.daggerinjector.coffemaker.module.DripCoffeeModule;
 import co.ikust.daggerinjector.example.R;
@@ -18,7 +19,7 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        CoffeeShop coffeeShop = DaggerInjector.inject(CoffeeShop.class, new DripCoffeeModule());
+        CoffeeShop coffeeShop = DaggerBuilder.build(CoffeeShop.class, new DripCoffeeModule());
 
         Log.d("coffeeShop", coffeeShop.toString());
     }

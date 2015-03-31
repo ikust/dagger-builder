@@ -39,5 +39,5 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    compile 'co.ikust.daggerinjector:injector:1.0.0@aar'
+    compile 'co.ikust.daggerbuilder:config:1.0.0@aar'
 }
