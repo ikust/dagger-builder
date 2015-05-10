@@ -1,4 +1,6 @@
 apply plugin: 'com.android.library'
+apply plugin: 'maven'
+apply plugin: 'signing'
 
 repositories {
     mavenCentral()
@@ -40,4 +42,90 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
     compile 'co.ikust.daggerbuilder:config:1.0.0@aar'
+}
+
+group = "co.ikust"
+archivesBaseName = "daggerbuilder"
+version = "1.0.0"
+
+configurations {
+    archives {
+        extendsFrom configurations.default
+    }
+}
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+
+    options {
+        encoding "utf-8"
+        links "http://docs.oracle.com/javase/7/docs/api/"
+        linksOffline "http://d.android.com/reference","${android.sdkDirectory}/docs/reference"
+    }
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            pom.project {
+                name 'Dagger Builder'
+                packaging 'aar'
+                artifactId 'daggerbuilder'
+                description 'A convenience library that adds means to perform dagger 2 injection without using generated code directly.'
+                url 'http://ikust.github.io/dagger-builder/'
+
+                scm {
+                    connection 'scm:git:git@github.com:ikust/dagger-builder.git'
+                    developerConnection 'scm:git:git@github.com:ikust/dagger-builder.git'
+                    url 'git@github.com:ikust/dagger-builder.git'
+                }
+
+                licenses {
+                    license {
+                        name 'The Apache License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'ikust'
+                        name 'Ivan Kušt'
+                        email 'ivan.kust@hotmail.com'
+                        organization ''
+                        organizationUrl 'https://github.com/ikust'
+                    }
+                }
+            }
+        }
+    }
 }

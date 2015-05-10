@@ -1,7 +1,7 @@
 builders.put(${packageName}.${componentName}.class, new Builder() {
     @Override
     public Object build(Object[] modules) {
-        return ${packageName}.Dagger_${componentName}.builder()
+        return ${packageName}.Dagger${componentName}.builder()
             ${injectImplementation}
             .build();
     }

@@ -1,7 +1,85 @@
 apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'signing'
+
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
     compile 'org.glassfish:javax.annotation:10.0-b28'
+}
+
+group = "co.ikust"
+archivesBaseName = "daggerbuilder-compiler"
+version = "1.0.1"
+
+configurations {
+    archives {
+        extendsFrom configurations.default
+    }
+}
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            pom.project {
+                name 'Dagger Builder Compiler'
+                packaging 'jar'
+                artifactId 'daggerbuilder-compiler'
+                description 'A convenience library that adds means to perform dagger 2 injection without using generated code directly - compiler.'
+                url 'http://ikust.github.io/dagger-builder/'
+
+                scm {
+                    connection 'scm:git:git@github.com:ikust/dagger-builder.git'
+                    developerConnection 'scm:git:git@github.com:ikust/dagger-builder.git'
+                    url 'git@github.com:ikust/dagger-builder.git'
+                }
+
+                licenses {
+                    license {
+                        name 'The Apache License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'ikust'
+                        name 'Ivan Kušt'
+                        email 'ivan.kust@hotmail.com'
+                        organization ''
+                        organizationUrl 'https://github.com/ikust'
+                    }
+                }
+            }
+        }
+    }
 }

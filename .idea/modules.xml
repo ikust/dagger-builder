@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/DaggerBuilder.iml" filepath="$PROJECT_DIR$/DaggerBuilder.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/config/config.iml" filepath="$PROJECT_DIR$/config/config.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dagger-builder.iml" filepath="$PROJECT_DIR$/dagger-builder.iml" />
       <module fileurl="file://$PROJECT_DIR$/daggerbuildercompiler/daggerbuildercompiler.iml" filepath="$PROJECT_DIR$/daggerbuildercompiler/daggerbuildercompiler.iml" />
       <module fileurl="file://$PROJECT_DIR$/library/library.iml" filepath="$PROJECT_DIR$/library/library.iml" />
     </modules>
